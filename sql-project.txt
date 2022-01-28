@@ -1,0 +1,103 @@
+/*
+Create a database with 3 tables:
+
+1) Teams
+2) Players
+3) Playerscores
+
+Create:
+- a relationships between tables, assuming that each team has several players and each player has several results (playerscores).
+- a query adding random data to all of the tables.
+- a query that changes the data of one selected player in the players table.
+- a query that removes one selected record from the playerscores table.
+- a query that sums the number of records in the teams table.
+- a query showing the first 3 records of the teams table sorted in ascending order by the team name.
+- a query showing the sum of the players' points for each team.
+*/
+
+
+CREATE DATABASE sports; 
+
+USE sports; 
+
+CREATE TABLE teams (
+team_id INT AUTO_INCREMENT, 
+team_name VARCHAR (50),
+year_established INT,
+PRIMARY KEY(team_id)
+);
+
+CREATE TABLE players (
+player_id INT AUTO_INCREMENT,
+first_name VARCHAR(50),
+last_name VARCHAR(50),
+birth_date DATE,
+team_id INT,
+PRIMARY KEY (player_id),
+FOREIGN KEY (team_id) REFERENCES teams(team_id)
+); 
+
+CREATE TABLE playerscores (
+score_id INT AUTO_INCREMENT, 
+date_scored DATE, 
+score INT,
+player_id INT, 
+PRIMARY KEY(score_id),
+FOREIGN KEY (player_id) REFERENCES players(player_id) 
+);
+
+-- query that adds data (insert) to the tables 
+INSERT INTO teams (team_name, year_established) VALUES ('Hawk',1980),
+('Phantom', 1962),
+('Thunder', 1975),
+('Speed', 1958);
+
+
+INSERT INTO players (first_name, last_name, birth_date, team_id) VALUES ('John', 'Gregory', '1982-10-03',1),
+('Thomas', 'Charles', '1979-07-05', 2),
+('Anderson', 'Kevin', '1987-11-19', 2),
+('Mark', 'Brian', '1990-08-13', 1),
+('Richard', 'Patrick', '1989-01-15', 4),
+('Scott', 'Smith', '1978-11-23', 3),
+('Michael', 'Nicholas', '1992-03-08', 3),
+('William', 'Harold', '1991-05-07', 4); 
+
+
+INSERT INTO playerscores(date_scored, score, player_id) VALUES ('2020-07-24', 4, 1),
+('2020-08-15', 2, 3),
+('2020-08-30', 7, 5),
+('2020-09-07', 4, 5),
+('2020-10-03', 5, 1),
+('2020-11-07', 1, 2),
+('2020-11-25', 8, 7),
+('2020-12-14', 6, 6);
+
+
+-- query that changes the data (update) of one of the players 
+UPDATE players
+SET first_name = 'Chris'  
+WHERE player_id = 3;
+
+
+-- query that removes (delete) one selected record from the playerscores table 
+DELETE FROM playerscores
+WHERE score_id = 6; 
+
+
+-- query that sums the number of records in the teams table
+SELECT COUNT(team_id) AS 'Number of teams'
+FROM teams;
+
+
+-- query that shows the first 3 records of the teams table sorted in ascending order by the team name 
+SELECT * FROM teams
+ORDER BY team_name 
+LIMIT 3; 
+
+
+-- query that shows the sum of players points for each team 
+SELECT teams.team_name, SUM(playerscores.score) AS 'total team score'
+FROM playerscores
+LEFT JOIN players ON players.player_id = playerscores.player_id
+LEFT JOIN teams ON players.team_id = teams.team_id
+GROUP BY teams.team_name; 
